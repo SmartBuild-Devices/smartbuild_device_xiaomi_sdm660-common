@@ -114,5 +114,19 @@ $(IMS_SYMLINKS): $(LOCAL_INSTALLED_MODULE)
 
 ALL_DEFAULT_INSTALLED_MODULES += $(IMS_SYMLINKS)
 
-include $(call all-makefiles-under,$(LOCAL_PATH))
+# Include all makefiles NOT in smartbuild/
+include $(filter-out $(wildcard $(LOCAL_PATH)/smartbuild/*/Android.mk),$(wildcard $(LOCAL_PATH)/*/Android.mk))
+
+# Traverse SmartBuild inheritance tree to inherit the "active" makefiles
+$(foreach layer,$(SMARTBUILD_INHERIT_STACK), \
+  $(if $(wildcard $(LOCAL_PATH)/smartbuild/$(layer)/Android.mk), \
+    $(eval include $(LOCAL_PATH)/smartbuild/$(layer)/Android.mk) \
+  ,) \
+)
+
+# Add the ROM specific Android.mk to the roster
+$(if $(wildcard $(LOCAL_PATH)/smartbuild/$(SMARTBUILD_RELEASE)/Android.mk), \
+  $(eval include $(LOCAL_PATH)/smartbuild/$(SMARTBUILD_RELEASE)/Android.mk) \
+,)
+
 endif

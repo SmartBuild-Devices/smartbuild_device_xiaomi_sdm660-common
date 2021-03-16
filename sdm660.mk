@@ -27,10 +27,7 @@ PRODUCT_COMPATIBLE_PROPERTY_OVERRIDE := true
 
 # Overlays
 DEVICE_PACKAGE_OVERLAYS += \
-    $(LOCAL_PATH)/overlay \
-    $(LOCAL_PATH)/overlay-lineage
-
-PRODUCT_ENFORCE_RRO_TARGETS := *
+    $(LOCAL_PATH)/overlay
 
 # Soong namespaces
 PRODUCT_SOONG_NAMESPACES += \
@@ -430,6 +427,12 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_BOOT_JARS += \
     WfdCommon
+
+# Inherit from SmartBuild layer stack
+$(foreach layer, $(SMARTBUILD_INHERIT_STACK), \
+    $(call inherit-product-if-exists, $(LOCAL_PATH)/smartbuild/$(layer)/sdm660.mk) \
+)
+$(call inherit-product-if-exists, $(LOCAL_PATH)/smartbuild/$(SMARTBUILD_RELEASE)/sdm660.mk)
 
 # Inherit the proprietary files
 $(call inherit-product, vendor/xiaomi/sdm660-common/sdm660-common-vendor.mk)
